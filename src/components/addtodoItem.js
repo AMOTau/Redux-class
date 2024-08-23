@@ -1,26 +1,40 @@
-import { useDispatch } from "react-redux";
-import { useState } from "react";
-import { addTodoItem } from "../redux/todoListReducer";
+import { useDispatch, useSelector } from "react-redux";
+import { useState, useEffect } from "react";
+import { addTodoItem, updateTodoItem } from "../redux/todoListReducer";
 
-function AddTodoItem() {
+function AddTodoItem({ editItem, setEditItem }) {
   const [item, setItem] = useState("");
   const dispatch = useDispatch();
 
-  // Date().now
-  // Date.now() ; 
+  useEffect(() => {
+    if (editItem) {
+      setItem(editItem.todoItem);
+    }
+  }, [editItem]);
 
-  const handleAddItem = () => {
-    dispatch(addTodoItem({ id: Date.now(), todoItem: item }));
+  const handleAddOrUpdateItem = () => {
+    if (editItem) {
+      dispatch(updateTodoItem({ id: editItem.id, todoItem: item }));
+      setEditItem(null);
+    } else {
+      dispatch(addTodoItem({ id: Date.now(), todoItem: item }));
+    }
+    setItem("");
   };
+
   return (
     <div>
       <input
         type="text"
         placeholder="Enter item"
+        value={item}
         onChange={(e) => setItem(e.target.value)}
       />
-      <button onClick={handleAddItem}>Add</button>
+      <button onClick={handleAddOrUpdateItem}>
+        {editItem ? "Update" : "Add"}
+      </button>
     </div>
   );
 }
+
 export default AddTodoItem;
